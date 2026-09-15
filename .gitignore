@@ -52,3 +52,27 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Database
+/db/*.db
+/db/*.db-journal
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Internal z.ai scaffolding
+.zscripts/
+.zscripts-*
+download/
+
+# Worklog (per-agent)
+worklog.md
+
+# Examples (legacy scaffold demos, not part of CRM)
+/examples/
