@@ -1,0 +1,393 @@
+// =====================================================
+//  CRM Clinic - Prisma Schema
+//  All entities are normalized with proper FK relations,
+//  indexes and audit-friendly fields. Designed to be
+//  portable to MySQL/PostgreSQL without logic changes.
+// =====================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------
+//  Auth & RBAC
+// -----------------------------
+
+model User {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  passwordHash    String
+  phone           String?
+  avatarUrl       String?
+  status          String   @default("active") // active | suspended
+  lastLoginAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  roles           UserRole[]
+  appointments    Appointment[]   @relation("AppointmentCreatedBy")
+  payments        Payment[]       @relation("PaymentReceivedBy")
+  patients        Patient[]       @relation("PatientCreatedBy")
+  leads           Lead[]          @relation("LeadAssignedTo")
+  tasksAssigned   Task[]          @relation("TaskAssignedTo")
+  tasksCreated    Task[]          @relation("TaskCreator")
+  notes           Note[]          @relation("NoteAuthor")
+  activities      Activity[]      @relation("ActivityUser")
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+  staffProfile    Staff?
+
+  @@index([status])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique // admin | doctor | secretary | operator | accountant
+  label       String   // human-readable Persian label
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. patients.create, appointments.delete
+  label       String
+  group       String   // patients | appointments | financial | ...
+  createdAt   DateTime @default(now())
+
+  roles       RolePermission[]
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+// -----------------------------
+//  Patients
+// -----------------------------
+
+model Patient {
+  id              String   @id @default(cuid())
+  code            String   @unique // sequential clinic code e.g. P-1001
+  firstName       String
+  lastName        String
+  mobile          String?  @unique
+  phone           String?
+  nationalId      String?  @unique
+  gender          String?  // male | female | other
+  birthDate       DateTime?
+  email           String?
+  address         String?
+  description     String?
+  status          String   @default("active") // active | inactive | blacklisted
+  source          String?  // walk_in | referral | instagram | ...
+  firstVisitAt    DateTime?
+  lastVisitAt     DateTime?
+  createdById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  createdBy       User         @relation("PatientCreatedBy", fields: [createdById], references: [id])
+  appointments    Appointment[]
+  payments        Payment[]
+  notes           Note[]
+  leads           Lead[]
+  tasks           Task[]
+  activities      Activity[]
+
+  @@index([firstName, lastName])
+  @@index([mobile])
+  @@index([status])
+}
+
+// -----------------------------
+//  Staff (Doctors + Employees)
+// -----------------------------
+
+model Staff {
+  id            String   @id @default(cuid())
+  userId        String?  @unique // optional link to User account
+  firstName     String
+  lastName      String
+  fullName      String   // denormalized for fast listing
+  type          String   // doctor | secretary | operator | manager | other
+  specialty     String?
+  phone         String?
+  email         String?
+  status        String   @default("active") // active | inactive
+  workDays      String?  // comma-separated: sat,sun,mon,tue,wed,thu,fri
+  workStart     String?  // "09:00"
+  workEnd       String?  // "17:00"
+  color         String?  // calendar color tag
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User?         @relation(fields: [userId], references: [id])
+  appointments  Appointment[] @relation("AppointmentDoctor")
+  services      ServiceStaff[]
+
+  @@index([type])
+  @@index([status])
+}
+
+// -----------------------------
+//  Services
+// -----------------------------
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  durationMin Int      @default(30) // duration in minutes
+  category    String?  // visit | consult | laser | injection | beauty | lab | other
+  status      String   @default("active") // active | inactive
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  staff       ServiceStaff[]
+  appointments Appointment[]
+
+  @@index([status])
+  @@index([category])
+}
+
+model ServiceStaff {
+  serviceId String
+  staffId   String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  staff     Staff   @relation(fields: [staffId],   references: [id], onDelete: Cascade)
+
+  @@id([serviceId, staffId])
+}
+
+// -----------------------------
+//  Appointments
+// -----------------------------
+
+model Appointment {
+  id          String   @id @default(cuid())
+  patientId   String
+  doctorId    String?
+  serviceId   String?
+  roomId      String?
+  startAt     DateTime
+  endAt       DateTime?
+  durationMin Int?
+  status      String   @default("booked")
+  // booked | confirmed | waiting | in_progress | done | cancelled | no_show
+  notes       String?
+  price       Float?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor      Staff?    @relation("AppointmentDoctor", fields: [doctorId], references: [id])
+  service     Service?  @relation(fields: [serviceId], references: [id])
+  createdBy   User      @relation("AppointmentCreatedBy", fields: [createdById], references: [id])
+  payments    Payment[]
+
+  @@index([startAt])
+  @@index([status])
+  @@index([patientId])
+  @@index([doctorId])
+}
+
+// -----------------------------
+//  Payments
+// -----------------------------
+
+model Payment {
+  id           String   @id @default(cuid())
+  patientId    String
+  appointmentId String?
+  amount       Float
+  discount     Float    @default(0)
+  finalAmount  Float
+  method       String   // cash | card | transfer | online
+  status       String   @default("paid") // paid | pending | refunded
+  reference    String?  // transaction reference
+  notes        String?
+  receivedById String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  patient      Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment  Appointment? @relation(fields: [appointmentId], references: [id])
+  receivedBy   User         @relation("PaymentReceivedBy", fields: [receivedById], references: [id])
+
+  @@index([patientId])
+  @@index([createdAt])
+  @@index([method])
+}
+
+// -----------------------------
+//  Leads (CRM pipeline)
+// -----------------------------
+
+model Lead {
+  id           String   @id @default(cuid())
+  firstName    String
+  lastName     String
+  mobile       String?
+  source       String?  // instagram | referral | walk_in | call | website | other
+  interest     String?  // service interested in
+  status       String   @default("new")
+  // new | contacted | interested | booked | visited | customer | lost
+  notes        String?
+  assignedToId String?
+  patientId    String?  // populated once converted to patient
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignedTo   User?    @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
+  patient      Patient? @relation(fields: [patientId], references: [id])
+
+  @@index([status])
+  @@index([mobile])
+  @@index([assignedToId])
+}
+
+// -----------------------------
+//  Tasks & Reminders
+// -----------------------------
+
+model Task {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  status       String   @default("pending") // pending | in_progress | done | cancelled
+  priority     String   @default("medium") // low | medium | high | urgent
+  dueDate      DateTime?
+  patientId    String?
+  assignedToId String?
+  createdById  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  patient      Patient? @relation(fields: [patientId], references: [id])
+  assignedTo   User?    @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
+  creator      User     @relation("TaskCreator", fields: [createdById], references: [id])
+
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([assignedToId])
+}
+
+// -----------------------------
+//  Notes (per-patient internal notes)
+// -----------------------------
+
+model Note {
+  id         String   @id @default(cuid())
+  patientId  String
+  content    String
+  authorId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  patient    Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  author     User     @relation("NoteAuthor", fields: [authorId], references: [id])
+
+  @@index([patientId])
+}
+
+// -----------------------------
+//  Activity log (per-patient timeline)
+// -----------------------------
+
+model Activity {
+  id         String   @id @default(cuid())
+  patientId  String?
+  userId     String
+  type       String   // appointment | payment | note | call | message | status | other
+  title      String
+  meta       String?  // JSON string with extra info
+  createdAt  DateTime @default(now())
+
+  patient    Patient? @relation(fields: [patientId], references: [id])
+  user       User     @relation("ActivityUser", fields: [userId], references: [id])
+
+  @@index([patientId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// -----------------------------
+//  Notifications
+// -----------------------------
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // appointment | task | payment | lead | system
+  title     String
+  body      String?
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+// -----------------------------
+//  Audit Log (system-wide)
+// -----------------------------
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   // create | update | delete | login | view | ...
+  entity     String   // patient | appointment | payment | user | ...
+  entityId   String?
+  ip         String?
+  userAgent  String?
+  payload    String?  // JSON snapshot of changes
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+// -----------------------------
+//  Clinic Settings (singleton-ish)
+// -----------------------------
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON-encoded
+  updatedAt DateTime @updatedAt
+}
