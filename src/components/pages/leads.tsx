@@ -38,6 +38,11 @@ import {
 import { toast } from "sonner";
 import { ROLE_LABELS } from "@/lib/permissions";
 
+// Radix Select forbids an empty-string item value (it is reserved to clear the
+// selection and show the placeholder), so we use a non-empty sentinel and map
+// it back to "" at the Select boundary.
+const NONE_VALUE = "__none__";
+
 type Lead = {
   id: string;
   firstName: string;
@@ -656,10 +661,10 @@ function LeadFormDialog({
               </Select>
             </FormField>
             <FormField label="مسئول پیگیری">
-              <Select value={form.assignedToId} onValueChange={(v) => setForm({ ...form, assignedToId: v })}>
+              <Select value={form.assignedToId || NONE_VALUE} onValueChange={(v) => setForm({ ...form, assignedToId: v === NONE_VALUE ? "" : v })}>
                 <SelectTrigger className="bg-background w-full"><SelectValue placeholder="بدون مسئول" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">بدون مسئول</SelectItem>
+                  <SelectItem value={NONE_VALUE}>بدون مسئول</SelectItem>
                   {users.map((u) => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
                 </SelectContent>
               </Select>

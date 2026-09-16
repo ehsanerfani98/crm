@@ -6,7 +6,7 @@ import {
   ErrorState, StatusBadge, FormField, useFetch, apiPut,
 } from "@/components/common";
 import { useAuthStore } from "@/lib/store";
-import { hasPermission, ROLE_LABELS, ROLE_PERMISSIONS, PERMISSIONS } from "@/lib/permissions";
+import { hasPermission, ROLE_LABELS, ROLE_PERMISSIONS } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -90,7 +90,7 @@ export function SettingsPage() {
 
         {canViewAudit && (
           <TabsContent value="roles">
-            <RolesTab />
+            <RolesTab canManage={canManageUsers} />
           </TabsContent>
         )}
 
@@ -339,14 +339,39 @@ function UserEditDialog({ user, onOpenChange, onSaved }: { user: UserRow; onOpen
 
 // ---------------- RolesTab ----------------
 
-function RolesTab() {
-  const [selected, setSelected] = useState<string>("admin");
+type RoleRow = {
+  id: string;
+  name: string;
+  label: string;
+  description: string | null;
+  permissions: string[];
+};
 
-  const groupedPerms = PERMISSIONS.reduce((acc, p) => {
+type RolesResp = {
+  roles: RoleRow[];
+  catalog: Array<{ name: string; label: string; group: string }>;
+};
+
+function RolesTab({ canManage }: { canManage: boolean }) {
+  const { data, error, loading, refetch } = useFetch<RolesResp>("/api/roles");
+  const [selected, setSelected] = useState<string>("");
+  const [draft, setDraft] = useState<string[] | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const roles = data?.roles || [];
+  const catalog = data?.catalog || [];
+
+  // Derive the active role: fall back to the first role until the user picks one.
+  const current = roles.find((r) => r.name === selected) || roles[0] || null;
+
+  // The draft is null until the user edits; otherwise it mirrors the saved set.
+  const effectiveDraft = draft ?? current?.permissions ?? [];
+
+  const groupedPerms = catalog.reduce((acc, p) => {
     if (!acc[p.group]) acc[p.group] = [];
     acc[p.group].push(p);
     return acc;
-  }, {} as Record<string, typeof PERMISSIONS[number][]>);
+  }, {} as Record<string, RolesResp["catalog"]>);
 
   const groupLabels: Record<string, string> = {
     patients: "مراجعین", appointments: "نوبت‌ها", leads: "لیدها", tasks: "وظایف",
@@ -354,22 +379,58 @@ function RolesTab() {
     settings: "تنظیمات", users: "کاربران", audit: "ممیزی",
   };
 
+  const isAdminRole = current?.name === "admin";
+  const editable = canManage && !isAdminRole;
+  const dirty =
+    !!current &&
+    (effectiveDraft.length !== current.permissions.length ||
+      effectiveDraft.some((p) => !current.permissions.includes(p)));
+
+  function selectRole(name: string) {
+    setSelected(name);
+    setDraft(null); // discard any unsaved edits when switching roles
+  }
+
+  function togglePerm(name: string) {
+    if (!editable) return;
+    setDraft((d) => {
+      const base = d ?? current?.permissions ?? [];
+      return base.includes(name) ? base.filter((x) => x !== name) : [...base, name];
+    });
+  }
+
+  async function handleSave() {
+    if (!current || !editable) return;
+    setSaving(true);
+    const res = await apiPut("/api/roles", { roleId: current.id, permissions: effectiveDraft });
+    if (res.ok) {
+      toast.success("دسترسی‌های نقش به‌روزرسانی شد.");
+      refetch();
+    } else {
+      toast.error(res.error || "خطا در ذخیره دسترسی‌ها.");
+    }
+    setSaving(false);
+  }
+
+  if (loading) return <LoadingState rows={5} />;
+  if (error || !data) return <ErrorState message={error || "خطا"} onRetry={refetch} />;
+
   return (
     <div className="grid lg:grid-cols-3 gap-4">
       {/* Role list */}
       <Card className="lg:col-span-1">
         <CardContent className="p-3">
           <div className="space-y-1">
-            {Object.entries(ROLE_LABELS).map(([name, label]) => {
-              const count = ROLE_PERMISSIONS[name]?.length || 0;
+            {roles.map((r) => {
+              const count = r.permissions.length;
               return (
                 <button
-                  key={name}
-                  onClick={() => setSelected(name)}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-sm transition ${selected === name ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                  key={r.name}
+                  onClick={() => selectRole(r.name)}
+                  className={`w-full flex items-center justify-between p-2.5 rounded-lg text-sm transition ${current?.name === r.name ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
                 >
-                  <span className="font-medium">{label}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${selected === name ? "bg-primary-foreground/20" : "bg-muted"}`}>
+                  <span className="font-medium">{r.label}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${current?.name === r.name ? "bg-primary-foreground/20" : "bg-muted"}`}>
                     {toPersianDigits(count)} دسترسی
                   </span>
                 </button>
@@ -382,9 +443,28 @@ function RolesTab() {
       {/* Permissions detail */}
       <Card className="lg:col-span-2">
         <CardContent className="p-4">
-          <h3 className="font-semibold mb-3">
-            دسترسی‌های نقش: {ROLE_LABELS[selected]}
-          </h3>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h3 className="font-semibold">
+              دسترسی‌های نقش: {current?.label || "—"}
+            </h3>
+            {editable && (
+              <Button size="sm" onClick={handleSave} disabled={saving || !dirty}>
+                {saving ? "در حال ذخیره…" : "ذخیره تغییرات"}
+              </Button>
+            )}
+          </div>
+
+          {isAdminRole && (
+            <p className="text-xs text-muted-foreground mb-3">
+              نقش «مدیر کل» به‌صورت پیش‌فرض به همه دسترسی‌ها دسترسی دارد و قابل تغییر نیست.
+            </p>
+          )}
+          {!canManage && !isAdminRole && (
+            <p className="text-xs text-muted-foreground mb-3">
+              برای ویرایش دسترسی‌ها به مجوز «مدیریت کاربران» نیاز دارید.
+            </p>
+          )}
+
           <div className="space-y-4 max-h-[60vh] overflow-y-auto custom-scroll">
             {Object.entries(groupedPerms).map(([group, perms]) => (
               <div key={group}>
@@ -393,12 +473,19 @@ function RolesTab() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-2">
                   {perms.map((p) => {
-                    const has = (ROLE_PERMISSIONS[selected] || []).includes(p.name);
+                    const has = effectiveDraft.includes(p.name);
                     return (
-                      <div key={p.name} className={`flex items-center gap-2 p-2 rounded-md ${has ? "bg-emerald-500/10" : "bg-muted/30 opacity-60"}`}>
-                        <Checkbox checked={has} disabled />
+                      <label
+                        key={p.name}
+                        className={`flex items-center gap-2 p-2 rounded-md ${editable ? "cursor-pointer hover:bg-muted/50" : ""} ${has ? "bg-emerald-500/10" : "bg-muted/30 opacity-60"}`}
+                      >
+                        <Checkbox
+                          checked={has}
+                          disabled={!editable}
+                          onCheckedChange={() => togglePerm(p.name)}
+                        />
                         <span className="text-sm flex-1">{p.label}</span>
-                      </div>
+                      </label>
                     );
                   })}
                 </div>

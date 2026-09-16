@@ -28,6 +28,11 @@ import {
 } from "@/lib/persian";
 import { toast } from "sonner";
 
+// Radix Select forbids an empty-string item value (it is reserved to clear the
+// selection and show the placeholder), so we use a non-empty sentinel and map
+// it back to "" at the Select boundary.
+const NONE_VALUE = "__none__";
+
 type Payment = {
   id: string;
   amount: number;
@@ -451,10 +456,10 @@ function PaymentFormDialog({
 
           {selectedPatient && appts.length > 0 && (
             <FormField label="نوبت مرتبط (اختیاری)">
-              <Select value={form.appointmentId} onValueChange={(v) => setForm({ ...form, appointmentId: v })}>
+              <Select value={form.appointmentId || NONE_VALUE} onValueChange={(v) => setForm({ ...form, appointmentId: v === NONE_VALUE ? "" : v })}>
                 <SelectTrigger className="bg-background w-full"><SelectValue placeholder="بدون نوبت" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">بدون نوبت</SelectItem>
+                  <SelectItem value={NONE_VALUE}>بدون نوبت</SelectItem>
                   {appts.map((a) => (
                     <SelectItem key={a.id} value={a.id}>{formatDate(a.startAt)} {a.service?.name ? `— ${a.service.name}` : ""}</SelectItem>
                   ))}

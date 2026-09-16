@@ -32,6 +32,11 @@ import {
 } from "@/lib/persian";
 import { toast } from "sonner";
 
+// Radix Select forbids an empty-string item value (it is reserved to clear the
+// selection and show the placeholder), so we use a non-empty sentinel and map
+// it back to "" at the Select boundary.
+const NONE_VALUE = "__none__";
+
 type Task = {
   id: string;
   title: string;
@@ -445,10 +450,10 @@ function TaskFormDialog({
             <PersianDateTimePicker value={form.dueDate} onChange={(v) => setForm({ ...form, dueDate: v })} />
           </FormField>
           <FormField label="مسئول">
-            <Select value={form.assignedToId} onValueChange={(v) => setForm({ ...form, assignedToId: v })}>
+            <Select value={form.assignedToId || NONE_VALUE} onValueChange={(v) => setForm({ ...form, assignedToId: v === NONE_VALUE ? "" : v })}>
               <SelectTrigger className="bg-background w-full"><SelectValue placeholder="بدون مسئول" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="">بدون مسئول</SelectItem>
+                <SelectItem value={NONE_VALUE}>بدون مسئول</SelectItem>
                 {users.map((u) => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
               </SelectContent>
             </Select>
