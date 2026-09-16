@@ -59,7 +59,7 @@ export function LoginScreen() {
                   placeholder="you@clinic.local"
                   required
                   autoComplete="email"
-                  dir="ltr"
+                  
                   className="text-left"
                 />
               </div>
@@ -72,7 +72,7 @@ export function LoginScreen() {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  dir="ltr"
+                  
                   className="text-left"
                 />
               </div>
@@ -94,11 +94,11 @@ export function LoginScreen() {
         <div className="mt-6 p-3 rounded-xl bg-muted/50 border border-border/50 text-xs text-muted-foreground">
           <div className="font-semibold text-foreground mb-2">حساب‌های آزمایشی (گذرواژه همه: <code className="font-mono">password</code>)</div>
           <ul className="space-y-1 leading-relaxed">
-            <li><span className="font-mono" dir="ltr">admin@clinic.local</span> — مدیر کل</li>
-            <li><span className="font-mono" dir="ltr">doctor@clinic.local</span> — پزشک</li>
-            <li><span className="font-mono" dir="ltr">secretary@clinic.local</span> — منشی</li>
-            <li><span className="font-mono" dir="ltr">operator@clinic.local</span> — اپراتور</li>
-            <li><span className="font-mono" dir="ltr">accountant@clinic.local</span> — حسابدار</li>
+            <li><span className="font-mono" >admin@clinic.local</span> — مدیر کل</li>
+            <li><span className="font-mono" >doctor@clinic.local</span> — پزشک</li>
+            <li><span className="font-mono" >secretary@clinic.local</span> — منشی</li>
+            <li><span className="font-mono" >operator@clinic.local</span> — اپراتور</li>
+            <li><span className="font-mono" >accountant@clinic.local</span> — حسابدار</li>
           </ul>
         </div>
 

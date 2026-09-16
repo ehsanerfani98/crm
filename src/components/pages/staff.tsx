@@ -198,8 +198,8 @@ export function StaffPage() {
                   )}
                 </div>
                 <div className="space-y-1 text-xs text-muted-foreground">
-                  {s.phone && <div className="flex items-center gap-1.5" dir="ltr"><Phone className="size-3.5" />{toPersianDigits(s.phone)}</div>}
-                  {s.email && <div className="flex items-center gap-1.5 truncate" dir="ltr"><Mail className="size-3.5" />{s.email}</div>}
+                  {s.phone && <div className="flex items-center gap-1.5" ><Phone className="size-3.5" />{toPersianDigits(s.phone)}</div>}
+                  {s.email && <div className="flex items-center gap-1.5 truncate" ><Mail className="size-3.5" />{s.email}</div>}
                   {(s.workStart || s.workEnd) && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="size-3.5" />
@@ -249,8 +249,8 @@ export function StaffPage() {
                 {detail.user && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">حساب کاربری متصل</span>}
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
-                {detail.phone && <div><span className="text-muted-foreground">تلفن:</span> <span dir="ltr">{toPersianDigits(detail.phone)}</span></div>}
-                {detail.email && <div className="truncate"><span className="text-muted-foreground">ایمیل:</span> <span dir="ltr">{detail.email}</span></div>}
+                {detail.phone && <div><span className="text-muted-foreground">تلفن:</span> <span >{toPersianDigits(detail.phone)}</span></div>}
+                {detail.email && <div className="truncate"><span className="text-muted-foreground">ایمیل:</span> <span >{detail.email}</span></div>}
                 {(detail.workStart || detail.workEnd) && (
                   <div><span className="text-muted-foreground">ساعات کاری:</span> {detail.workStart && toPersianDigits(detail.workStart)} - {detail.workEnd && toPersianDigits(detail.workEnd)}</div>
                 )}
@@ -431,10 +431,10 @@ function StaffFormDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <FormField label="تلفن" error={errors.phone} hint="۱۱ رقم با ۰">
-              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} dir="ltr" className="text-left" placeholder="0912xxxxxxx" />
+              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}  className="text-left" placeholder="0912xxxxxxx" />
             </FormField>
             <FormField label="ایمیل" error={errors.email}>
-              <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} dir="ltr" className="text-left" placeholder="name@example.com" />
+              <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}  className="text-left" placeholder="name@example.com" />
             </FormField>
           </div>
 
@@ -451,10 +451,10 @@ function StaffFormDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label="شروع کار">
-              <Input type="time" value={form.workStart} onChange={(e) => setForm({ ...form, workStart: e.target.value })} dir="ltr" className="text-left bg-background" />
+              <Input type="time" value={form.workStart} onChange={(e) => setForm({ ...form, workStart: e.target.value })}  className="text-left bg-background" />
             </FormField>
             <FormField label="پایان کار">
-              <Input type="time" value={form.workEnd} onChange={(e) => setForm({ ...form, workEnd: e.target.value })} dir="ltr" className="text-left bg-background" />
+              <Input type="time" value={form.workEnd} onChange={(e) => setForm({ ...form, workEnd: e.target.value })}  className="text-left bg-background" />
             </FormField>
           </div>
 

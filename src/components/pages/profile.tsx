@@ -65,7 +65,7 @@ export function ProfilePage() {
             </Avatar>
             <div className="flex-1 text-center sm:text-right">
               <h2 className="text-xl font-bold">{user.name}</h2>
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-muted-foreground mt-1" dir="ltr">
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-muted-foreground mt-1" >
                 <Mail className="size-4" />
                 {user.email}
               </div>
@@ -97,10 +97,10 @@ export function ProfilePage() {
                 <Input defaultValue={user.name} />
               </FormField>
               <FormField label="ایمیل">
-                <Input defaultValue={user.email} dir="ltr" className="text-left" disabled />
+                <Input defaultValue={user.email}  className="text-left" disabled />
               </FormField>
               <FormField label="شماره تماس">
-                <Input defaultValue="" dir="ltr" className="text-left" placeholder="0912xxxxxxx" />
+                <Input defaultValue=""  className="text-left" placeholder="0912xxxxxxx" />
               </FormField>
               <Button type="submit" disabled>
                 ذخیره تغییرات
@@ -121,13 +121,13 @@ export function ProfilePage() {
               }}
             >
               <FormField label="رمز عبور فعلی">
-                <Input type="password" dir="ltr" className="text-left" />
+                <Input type="password"  className="text-left" />
               </FormField>
               <FormField label="رمز عبور جدید">
-                <Input type="password" dir="ltr" className="text-left" />
+                <Input type="password"  className="text-left" />
               </FormField>
               <FormField label="تکرار رمز عبور جدید">
-                <Input type="password" dir="ltr" className="text-left" />
+                <Input type="password"  className="text-left" />
               </FormField>
               <Button type="submit" disabled>
                 <KeyRound className="size-4 ml-1" />

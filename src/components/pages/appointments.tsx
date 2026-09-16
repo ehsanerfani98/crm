@@ -412,7 +412,7 @@ export function AppointmentsPage() {
                           <tr key={a.id} className="hover:bg-muted/30 cursor-pointer" onClick={() => canUpdate && openEdit(a)}>
                             <td className="p-3">
                               <div className="font-medium">{formatDate(a.startAt)}</div>
-                              <div className="text-xs text-muted-foreground" dir="ltr">{formatTime(a.startAt)} - {a.endAt ? formatTime(a.endAt) : "—"}</div>
+                              <div className="text-xs text-muted-foreground" >{formatTime(a.startAt)} - {a.endAt ? formatTime(a.endAt) : "—"}</div>
                             </td>
                             <td className="p-3">
                               <div className="flex items-center gap-2">

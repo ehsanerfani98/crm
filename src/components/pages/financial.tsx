@@ -265,7 +265,7 @@ export function FinancialPage() {
                         <td className="p-3 tabular font-semibold">{formatNumber(p.finalAmount)}</td>
                         <td className="p-3"><StatusBadge status={p.method} /></td>
                         <td className="p-3"><StatusBadge status={p.status} /></td>
-                        <td className="p-3 text-xs text-muted-foreground font-mono" dir="ltr">{p.reference ? toPersianDigits(p.reference) : "—"}</td>
+                        <td className="p-3 text-xs text-muted-foreground font-mono" >{p.reference ? toPersianDigits(p.reference) : "—"}</td>
                         <td className="p-3 text-muted-foreground text-xs">{p.receivedBy?.name || "—"}</td>
                       </tr>
                     ))}
@@ -502,7 +502,7 @@ function PaymentFormDialog({
           </div>
 
           <FormField label="شماره مرجع">
-            <Input value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} dir="ltr" className="text-left" placeholder="کد تراکنش…" />
+            <Input value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })}  className="text-left" placeholder="کد تراکنش…" />
           </FormField>
 
           <FormField label="یادداشت">

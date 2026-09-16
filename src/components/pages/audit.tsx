@@ -166,7 +166,7 @@ export function AuditPage() {
                         </td>
                         <td className="p-3 text-muted-foreground">{ENTITY_LABEL[a.entity] || a.entity}</td>
                         <td className="p-3 text-xs font-mono text-muted-foreground">{a.entityId ? toPersianDigits(a.entityId.slice(-6)) : "—"}</td>
-                        <td className="p-3 text-xs font-mono text-muted-foreground" dir="ltr">{a.ip || "—"}</td>
+                        <td className="p-3 text-xs font-mono text-muted-foreground" >{a.ip || "—"}</td>
                         <td className="p-3">
                           <ChevronLeft className="size-4 text-muted-foreground" />
                         </td>
@@ -190,7 +190,7 @@ export function AuditPage() {
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                       <span>{ENTITY_LABEL[a.entity] || a.entity}</span>
-                      {a.ip && <span dir="ltr">• {a.ip}</span>}
+                      {a.ip && <span >• {a.ip}</span>}
                     </div>
                   </div>
                 ))}
@@ -226,7 +226,7 @@ export function AuditPage() {
                 <div>
                   <div className="text-xs text-muted-foreground">کاربر</div>
                   <div className="font-medium">{detail.user?.name || "—"}</div>
-                  {detail.user?.email && <div className="text-xs text-muted-foreground" dir="ltr">{detail.user.email}</div>}
+                  {detail.user?.email && <div className="text-xs text-muted-foreground" >{detail.user.email}</div>}
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">عملیات</div>
@@ -240,21 +240,21 @@ export function AuditPage() {
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">شناسه</div>
-                  <div className="font-mono text-xs" dir="ltr">{detail.entityId || "—"}</div>
+                  <div className="font-mono text-xs" >{detail.entityId || "—"}</div>
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">IP</div>
-                  <div className="font-mono text-xs" dir="ltr">{detail.ip || "—"}</div>
+                  <div className="font-mono text-xs" >{detail.ip || "—"}</div>
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">User Agent</div>
-                  <div className="text-xs text-muted-foreground truncate" dir="ltr">{detail.userAgent || "—"}</div>
+                  <div className="text-xs text-muted-foreground truncate" >{detail.userAgent || "—"}</div>
                 </div>
               </div>
               {detail.payload && (
                 <div>
                   <div className="text-xs text-muted-foreground mb-1">محتوای رویداد</div>
-                  <pre className="text-xs bg-muted/40 rounded-md p-3 overflow-x-auto custom-scroll" dir="ltr">
+                  <pre className="text-xs bg-muted/40 rounded-md p-3 overflow-x-auto custom-scroll" >
                     {(() => {
                       try {
                         return JSON.stringify(JSON.parse(detail.payload), null, 2);

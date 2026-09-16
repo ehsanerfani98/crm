@@ -197,7 +197,7 @@ export function PatientsListPage() {
                             <span className="font-medium">{p.firstName} {p.lastName}</span>
                           </div>
                         </td>
-                        <td className="p-3" dir="ltr">{toPersianDigits(p.mobile || "—")}</td>
+                        <td className="p-3" >{toPersianDigits(p.mobile || "—")}</td>
                         <td className="p-3 text-muted-foreground text-xs">{p.lastVisitAt ? formatRelativeTime(p.lastVisitAt) : "—"}</td>
                         <td className="p-3 tabular">{toPersianDigits(p._count?.appointments || 0)}</td>
                         <td className="p-3"><StatusBadge status={p.status} /></td>
@@ -252,7 +252,7 @@ export function PatientsListPage() {
                           </div>
                           <StatusBadge status={p.status} />
                         </div>
-                        <div className="text-xs text-muted-foreground mt-0.5" dir="ltr">
+                        <div className="text-xs text-muted-foreground mt-0.5" >
                           {toPersianDigits(p.mobile || "—")}
                         </div>
                         <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -421,10 +421,10 @@ function PatientFormDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <FormField label="شماره موبایل" error={errors.mobile} hint="۱۱ رقم، با ۰۹ شروع شود">
-              <Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} dir="ltr" className="text-left" placeholder="0912xxxxxxx" />
+              <Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })}  className="text-left" placeholder="0912xxxxxxx" />
             </FormField>
             <FormField label="کد ملی" error={errors.nationalId}>
-              <Input value={form.nationalId} onChange={(e) => setForm({ ...form, nationalId: e.target.value })} dir="ltr" className="text-left" placeholder="XXXXXXXXXX" />
+              <Input value={form.nationalId} onChange={(e) => setForm({ ...form, nationalId: e.target.value })}  className="text-left" placeholder="XXXXXXXXXX" />
             </FormField>
           </div>
           <div className="grid grid-cols-2 gap-3">

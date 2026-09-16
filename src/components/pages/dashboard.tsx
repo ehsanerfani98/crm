@@ -114,7 +114,7 @@ export function DashboardPage() {
             {chartData.every((d) => d.value === 0) ? (
               <EmptyState title="داده‌ای برای نمایش وجود ندارد" description="هنوز پرداختی ثبت نشده است." />
             ) : (
-              <div className="h-56 w-full" dir="ltr">
+              <div className="h-56 w-full" >
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                     <defs>

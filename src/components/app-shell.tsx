@@ -313,7 +313,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
                       <span className="font-medium">{user?.name}</span>
-                      <span className="text-xs text-muted-foreground font-normal" dir="ltr">{user?.email}</span>
+                      <span className="text-xs text-muted-foreground font-normal" >{user?.email}</span>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />

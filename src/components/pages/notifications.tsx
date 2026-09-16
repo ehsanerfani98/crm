@@ -161,7 +161,7 @@ export function NotificationsPage() {
                         <span>•</span>
                         <span>{formatRelativeTime(n.createdAt)}</span>
                         <span>•</span>
-                        <span dir="ltr">{formatDate(n.createdAt)} {formatTime(n.createdAt)}</span>
+                        <span >{formatDate(n.createdAt)} {formatTime(n.createdAt)}</span>
                       </div>
                     </div>
                     {n.read && <CheckCircle2 className="size-4 text-muted-foreground shrink-0 mt-1" />}

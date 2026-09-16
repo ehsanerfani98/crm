@@ -363,7 +363,7 @@ export function LeadsPage() {
                                 </button>
                               ) : `${l.firstName} ${l.lastName}`}
                             </td>
-                            <td className="p-3" dir="ltr">{l.mobile ? toPersianDigits(l.mobile) : "—"}</td>
+                            <td className="p-3" >{l.mobile ? toPersianDigits(l.mobile) : "—"}</td>
                             <td className="p-3">{l.source ? <StatusBadge status={l.source} /> : "—"}</td>
                             <td className="p-3 text-muted-foreground">{l.interest || "—"}</td>
                             <td className="p-3 text-muted-foreground">{l.assignedTo?.name || "—"}</td>
@@ -395,7 +395,7 @@ export function LeadsPage() {
                           <div className="font-semibold text-sm">{l.firstName} {l.lastName}</div>
                           <StatusBadge status={l.status} />
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1" dir="ltr">{l.mobile ? toPersianDigits(l.mobile) : "—"}</div>
+                        <div className="text-xs text-muted-foreground mt-1" >{l.mobile ? toPersianDigits(l.mobile) : "—"}</div>
                         <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                           {l.source && <StatusBadge status={l.source} />}
                           {l.interest && <span className="flex items-center gap-1"><Sparkles className="size-3" />{l.interest}</span>}
@@ -541,7 +541,7 @@ function LeadCardBody({ lead }: { lead: Lead }) {
         {lead.source && <StatusBadge status={lead.source} />}
       </div>
       {lead.mobile && (
-        <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1" dir="ltr">
+        <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1" >
           <Phone className="size-3" />
           {toPersianDigits(lead.mobile)}
         </div>
@@ -637,7 +637,7 @@ function LeadFormDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <FormField label="موبایل" error={errors.mobile} hint="۱۱ رقم با ۰۹">
-              <Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} dir="ltr" className="text-left" placeholder="0912xxxxxxx" />
+              <Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })}  className="text-left" placeholder="0912xxxxxxx" />
             </FormField>
             <FormField label="منبع">
               <Select value={form.source} onValueChange={(v) => setForm({ ...form, source: v })}>

@@ -132,7 +132,7 @@ function ClinicTab({ clinic, canManage, onSaved }: { clinic: Clinic; canManage: 
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} disabled={!canManage} />
             </FormField>
             <FormField label="تلفن">
-              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} disabled={!canManage} dir="ltr" className="text-left" />
+              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} disabled={!canManage}  className="text-left" />
             </FormField>
           </div>
           <FormField label="آدرس">
@@ -208,8 +208,8 @@ function UsersTab({ users, canManage, onSaved }: { users: UserRow[]; canManage: 
                             <span className="font-medium">{u.name}</span>
                           </div>
                         </td>
-                        <td className="p-3 text-xs" dir="ltr">{u.email}</td>
-                        <td className="p-3 text-xs" dir="ltr">{u.phone ? toPersianDigits(u.phone) : "—"}</td>
+                        <td className="p-3 text-xs" >{u.email}</td>
+                        <td className="p-3 text-xs" >{u.phone ? toPersianDigits(u.phone) : "—"}</td>
                         <td className="p-3">
                           <div className="flex flex-wrap gap-1">
                             {u.roles.map((r, i) => (
@@ -243,7 +243,7 @@ function UsersTab({ users, canManage, onSaved }: { users: UserRow[]; canManage: 
                         </Avatar>
                         <div>
                           <div className="font-semibold text-sm">{u.name}</div>
-                          <div className="text-xs text-muted-foreground" dir="ltr">{u.email}</div>
+                          <div className="text-xs text-muted-foreground" >{u.email}</div>
                         </div>
                       </div>
                       <StatusBadge status={u.status} />
@@ -305,7 +305,7 @@ function UserEditDialog({ user, onOpenChange, onSaved }: { user: UserRow; onOpen
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </FormField>
           <FormField label="تلفن">
-            <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} dir="ltr" className="text-left" />
+            <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}  className="text-left" />
           </FormField>
           <FormField label="وضعیت">
             <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>

@@ -166,7 +166,7 @@ export function ReportsPage() {
                 {byDayChart.every((d) => d.value === 0) ? (
                   <EmptyState title="داده‌ای برای نمایش نیست" />
                 ) : (
-                  <div className="h-64 w-full" dir="ltr">
+                  <div className="h-64 w-full" >
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={byDayChart} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
@@ -192,7 +192,7 @@ export function ReportsPage() {
                 {byMethodChart.length === 0 ? (
                   <EmptyState title="داده‌ای موجود نیست" />
                 ) : (
-                  <div className="h-64 w-full" dir="ltr">
+                  <div className="h-64 w-full" >
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie data={byMethodChart} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={(entry) => `${entry.name}`}>
@@ -220,7 +220,7 @@ export function ReportsPage() {
               {topServicesChart.length === 0 ? (
                 <EmptyState title="داده‌ای موجود نیست" />
               ) : (
-                <div className="h-72 w-full" dir="ltr">
+                <div className="h-72 w-full" >
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={topServicesChart} layout="vertical" margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#eee" horizontal={false} />
